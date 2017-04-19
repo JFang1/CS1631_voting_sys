@@ -74,7 +74,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@+id/serverPortLayout"
+            android:layout_below="@id/serverPortLayout"
             android:id="@+id/scopeLayout"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp">
@@ -225,6 +225,31 @@
                 android:layout_weight="1"/>
 
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/idLayout"
+            android:id="@+id/categoryLayout"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp">
+            <TextView
+                android:id="@+id/categoryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Category"
+                android:layout_marginLeft="10dp"
+                android:textStyle="normal|bold" />
+
+            <EditText
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:id="@+id/categoryContent"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 
@@ -251,6 +276,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/sendButton" />
+            <Button
+                android:text="Upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/uploadButton" />
             <Button
                 android:text="Connect"
                 android:layout_width="wrap_content"
