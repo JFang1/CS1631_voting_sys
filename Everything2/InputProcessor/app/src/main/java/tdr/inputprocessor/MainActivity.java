@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     private static ArrayList<String> VoterTable = new ArrayList<>();
     private static Map<String, VoteItem> TallyTable = new HashMap<>();
     private static boolean open = false;
+    private static ArrayList<String> Categories = new ArrayList<>();
 
     //The object is passed to the socket thread and used as callbacks to update UI.
     static Handler callbacks = new Handler(){
@@ -111,6 +112,8 @@ public class MainActivity extends AppCompatActivity {
                                     VoterTable.add(VoterPhone);
                                     TallyTable.get(CandidateID).add();
                                     list = generateReplyMessage(0, message);
+
+                                    sendTrendData((KeyValueList)msg.obj);
                                 }
                                 list.putPair("Phone", VoterPhone);
                                 break;
@@ -125,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
                                     System.exit(0);
                                 }
                                 break;
-                            case "Add":
+                            case "New":
                                 String id = ((KeyValueList)msg.obj).getValue("CandidateID");
 
                                 if (temp == null || !temp.equals(SAVED_PASS))
@@ -176,11 +179,27 @@ public class MainActivity extends AppCompatActivity {
                                     processTallies();
                                     VoterTable.clear();
                                     TallyTable.clear();
+                                    Categories.clear();
                                     list = generateReplyMessage(0, message);
                                 }
                                 else
                                 {
                                     list = generateReplyMessage(8, message);
+                                }
+                                break;
+                            case "Add":
+                                if (temp == null || !temp.equals(SAVED_PASS))
+                                {
+                                    list = generateReplyMessage(6, message);
+                                }
+                                else if (Categories.contains(((KeyValueList)msg.obj).getValue("Category")))
+                                {
+                                    list = generateReplyMessage(11, message);
+                                }
+                                else
+                                {
+                                    Categories.add(((KeyValueList)msg.obj).getValue("Category"));
+                                    list = generateReplyMessage(0, message);
                                 }
                                 break;
                             default:
@@ -291,6 +310,25 @@ public class MainActivity extends AppCompatActivity {
             KeyValueList list = generateReadingMessage(sortValues);
             client.setMessage(list);
     }
+
+    private static void sendTrendData(KeyValueList kvList) {
+        KeyValueList list = kvList;
+        //Set the scope of the message
+        list.putPair("Scope",SCOPE);
+        //Set the message type
+        list.putPair("MessageType","Reading");
+        //Set the sender or name of the message
+        list.putPair("Sender",SENDER);
+        //Set the role of the message
+        list.putPair("Role","Basic");
+        list.putPair("Message","New Vote");
+        list.putPair("Receiver", "TrendsAnalyzer");
+
+        if (client != null) {
+            client.setMessage(list);
+        }
+    }
+
     //Generate a test register message, please replace something of attributes with your own.
     KeyValueList generateRegisterMessage(){
         KeyValueList list = new KeyValueList();
@@ -364,6 +402,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case 10:
                 list.putPair("Description", "Action Denied. Candidate List is Empty");
+                break;
+            case 11:
+                list.putPair("Description", "Action Denied. Category Already Exists");
                 break;
             case 0:
                 list.putPair("Description", "Action Approved");
