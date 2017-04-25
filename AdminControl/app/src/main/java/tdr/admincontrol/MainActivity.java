@@ -231,76 +231,76 @@ public class MainActivity extends AppCompatActivity {
                 }
                 else
                 {*/
-                    KeyValueList list;
-                    int iterations;
+                KeyValueList list;
+                int iterations;
 
-                    if (fileText.isEmpty())
-                        iterations = 1;
-                    else {
-                        iterations = fileText.size();
-                    }
+                if (fileText.isEmpty())
+                    iterations = 1;
+                else {
+                    iterations = fileText.size();
+                }
 
-                    for (int i = 0; i < iterations; i++) {
-                        list = new KeyValueList();
-                        list.putPair("Scope", SCOPE);
-                        list.putPair("MessageType", msgType);
-                        list.putPair("Sender", SENDER);
-                        list.putPair("Receiver", receive);
-                        list.putPair("Message", msg);
-                        list.putPair("Passcode", pass);
-                        list.putPair("CandidateID", id);
-                        list.putPair("Category", cat);
+                for (int i = 0; i < iterations; i++) {
+                    list = new KeyValueList();
+                    list.putPair("Scope", SCOPE);
+                    list.putPair("MessageType", msgType);
+                    list.putPair("Sender", SENDER);
+                    list.putPair("Receiver", receive);
+                    list.putPair("Message", msg);
+                    list.putPair("Passcode", pass);
+                    list.putPair("CandidateID", id);
+                    list.putPair("Category", cat);
 
-                        if (!fileText.isEmpty()) {
+                    if (!fileText.isEmpty()) {
                             /*if (fileText.get(0).equals("Categories"))
                             {
                                 list.putPair("Category", fileText.get(i + 1));
                             }
                             else
                             {*/
-                                String line = fileText.get(i);
-                                String[] segments = line.split(":");
+                        String line = fileText.get(i);
+                        String[] segments = line.split(":");
 
-                                while (list.getValue(segments[0]).equals(""))
-                                {
-                                    //Toast.makeText(MainActivity.this, segments[0], Toast.LENGTH_SHORT).show();
-                                    list.putPair(segments[0], segments[1]);
-                                    i++;
-                                    if (i == iterations)
-                                        break;
-                                    line = fileText.get(i);
-                                    segments = line.split(":");
-                                }
-                                i--;
-                            //}
-                        }
-
-                        if (client == null || !client.isSocketAlive()) {
-                            Toast.makeText(MainActivity.this,"Connect to Server First.",Toast.LENGTH_SHORT).show();
-                        }
-                        else if (list.getValue("MessageType").equals(""))
+                        while (list.getValue(segments[0]).equals(""))
                         {
-                            Toast.makeText(MainActivity.this,"Please Enter MessageType.",Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(MainActivity.this, segments[0], Toast.LENGTH_SHORT).show();
+                            list.putPair(segments[0], segments[1]);
+                            i++;
+                            if (i == iterations)
+                                break;
+                            line = fileText.get(i);
+                            segments = line.split(":");
                         }
-                        else if (list.getValue("Receiver").equals(""))
-                        {
-                            Toast.makeText(MainActivity.this,"Please Enter Receiver.",Toast.LENGTH_SHORT).show();
-                        }
-                        else if (list.getValue("Message").equals(""))
-                        {
-                            Toast.makeText(MainActivity.this,"Please Enter Message.",Toast.LENGTH_SHORT).show();
-                        }
-                        else
-                        {
-                            client.setMessage(list);
-                        }
+                        i--;
+                        //}
                     }
 
-                    passcode.setText("");
-                    message.setText("");
-                    candidateID.setText("");
-                    category.setText("");
-                    fileText.clear();
+                    if (client == null || !client.isSocketAlive()) {
+                        Toast.makeText(MainActivity.this,"Connect to Server First.",Toast.LENGTH_SHORT).show();
+                    }
+                    else if (list.getValue("MessageType").equals(""))
+                    {
+                        Toast.makeText(MainActivity.this,"Please Enter MessageType.",Toast.LENGTH_SHORT).show();
+                    }
+                    else if (list.getValue("Receiver").equals(""))
+                    {
+                        Toast.makeText(MainActivity.this,"Please Enter Receiver.",Toast.LENGTH_SHORT).show();
+                    }
+                    else if (list.getValue("Message").equals(""))
+                    {
+                        Toast.makeText(MainActivity.this,"Please Enter Message.",Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        client.setMessage(list);
+                    }
+                }
+
+                passcode.setText("");
+                message.setText("");
+                candidateID.setText("");
+                category.setText("");
+                fileText.clear();
                 //}
             }
         });
@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
                 //Uri uri = FileProvider.getUriForFile(this, "edu.pitt.cs.cs1635.jah234.cathedraltourguide.fileprovider", file);
                 intent.setType("*/*");
                 //try {
-                    startActivityForResult(intent, 1);
+                startActivityForResult(intent, 1);
                 /*} catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(PlaceholderFragment.this.getContext(), "Please install a File Manager.",Toast.LENGTH_LONG).show();
                 }*/
@@ -346,9 +346,27 @@ public class MainActivity extends AppCompatActivity {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         //Toast.makeText(this, Boolean.toString(inputStream == null), Toast.LENGTH_SHORT).show();
         String line;
+        StringBuilder item = new StringBuilder();
+        boolean start = false;
 
         while ((line = reader.readLine()) != null) {
-            fileText.add(line);
+            if (!start && line.contains("<Msg>"))
+                start = true;
+
+            if (start && line.contains("</Msg>"))
+                start = false;
+
+            if (start)
+            {
+                if (line.contains("<Item>"))
+                    item = new StringBuilder();
+                if (line.contains("<Key>"))
+                    item.append(line.replace("<Key>", "").replace("</Key>", "")).append(":");
+                if (line.contains("<Value>"))
+                    item.append(line.replace("<Value>", "").replace("</Value>", ""));
+                if (line.contains("</Item>"))
+                    fileText.add(item.toString());
+            }
         }
     }
 
