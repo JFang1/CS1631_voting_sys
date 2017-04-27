@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                             }
                             break;
                         case "Close":
-                            organizeResults();
+                            organizeResults(true);
                             list = generateResultMessage();
                             break;
                         case "Open":
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static String organizeResults() {
+    public static String organizeResults(boolean mode) {
         finalTally = new StringBuilder();
         tallies = new HashMap<>(candidateMap.size());
 
@@ -254,17 +254,20 @@ public class MainActivity extends AppCompatActivity {
             mostPopularCategory(table.getCategory(i));
         }
 
-        recyclerView.setVisibility(View.GONE);
-        results.setVisibility(View.VISIBLE);
-        results.setText(finalTally);
+        if (mode) {
+            recyclerView.setVisibility(View.GONE);
+            results.setVisibility(View.VISIBLE);
+            results.setText(finalTally);
 
-        String previous = previousData.getString((year - 1) + "Data", "");
-        if (!previous.equals(""))
-            results.append("\nPrevious Year's Trends: " + previous);
 
-        SharedPreferences.Editor editor = previousData.edit();
-        editor.putString(year + "Data", finalTally.toString());
-        editor.apply();
+            String previous = previousData.getString((year - 1) + "Data", "");
+            if (!previous.equals(""))
+                results.append("\nPrevious Year's Trends: " + previous);
+
+            SharedPreferences.Editor editor = previousData.edit();
+            editor.putString(year + "Data", finalTally.toString());
+            editor.apply();
+        }
 
         return finalTally.toString();
     }

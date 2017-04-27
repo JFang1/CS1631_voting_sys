@@ -2,7 +2,7 @@ package tdr.trendsanalyzer;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
+
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -45,9 +45,12 @@ public class UnitTestMain {
         table.add(kvList1); // add votes to table
         table.add(kvList2);
         table.add(kvList3);
+        table.addCategory("CandidateID");
+        table.addCategory("Candidate Type");
 
         String expectedStr = "Most Popular Candidate: ID A; Gaming type with 2 votes out of 3\n";
-        assertEquals(expectedStr, MainActivity.organizeResults());
+
+        assertEquals(expectedStr, MainActivity.organizeResults(false));
 
         // vote for O 3 times
         KeyValueList kvList4 = new KeyValueList();
@@ -60,7 +63,7 @@ public class UnitTestMain {
         table.add(kvList5);
         table.add(kvList6);
         String expectedStrO = "Most Popular Candidate: ID O; Embedded Systems type with 3 votes out of 6\n";
-        assertEquals(expectedStrO, MainActivity.organizeResults());
+        assertEquals(expectedStrO, MainActivity.organizeResults(false));
     }
 
     @Test
@@ -110,6 +113,9 @@ public class UnitTestMain {
         KeyValueList kvList6 = new KeyValueList();
         kvList6.putPair("CandidateID", "E");
         table.add(kvList6);
+
+        table.addCategory("CandidateID");
+        table.addCategory("Candidate Type");
 
         String expectedStr = "Most Popular Gaming out of 5: A with 2 votes out of 6\n";
         assertEquals(expectedStr, MainActivity.mostPopularCategory("Gaming"));
