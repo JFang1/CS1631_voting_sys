@@ -72,11 +72,11 @@ public class MainActivity extends AppCompatActivity {
                     if (message.equals("New"))
                     {
                         if (RESULT == null)
-                            messageReceivedListText.append("Error: No Expected Test Result Saved");
+                            messageReceivedListText.append("\n********************\nError: No Expected Test Result Saved");
                         else if (list.getValue("Result").equals(RESULT))
-                            messageReceivedListText.append("Test Results Approved");
+                            messageReceivedListText.append("\n********************\nTest Results Approved");
                         else
-                            messageReceivedListText.append("Test Results Failed");
+                            messageReceivedListText.append("\n********************\nTest Results Failed");
                     }
                     else if(message.equals("Preset"))
                     {
