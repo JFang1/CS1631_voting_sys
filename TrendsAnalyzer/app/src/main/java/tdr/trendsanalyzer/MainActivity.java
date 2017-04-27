@@ -2,6 +2,7 @@ package tdr.trendsanalyzer;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.hardware.camera2.CameraCharacteristics;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +65,10 @@ public class MainActivity extends AppCompatActivity {
     private static StringBuilder finalTally;
     private static HashMap<String, TallyItem> tallies;
 
+    private static int year;
+
+    private static SharedPreferences previousData;
+
     static Handler callbacks = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -96,14 +102,14 @@ public class MainActivity extends AppCompatActivity {
                                 refresh.performClick();
                                 list = generateReplyMessage(0, message);
                             }
-                            if (client != null)
-                            {
-                                client.setMessage(list);
-                            }
                             break;
                         case "New Vote":
-                            if (candidateMap.containsKey(((KeyValueList)msg.obj).getValue("CandidateID")))
+                            KeyValueList kvList = (KeyValueList)msg.obj;
+                            if (candidateMap.containsKey(kvList.getValue("CandidateID")))
+                            {
+                                kvList.putPair("Candidate Type", candidateMap.get(kvList.getValue("CandidateID")));
                                 table.add((KeyValueList)msg.obj);
+                            }
                             adapter.notifyDataSetChanged();
                             break;
                         case "Table":
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                             break;
                         case "Close":
                             organizeResults();
+                            list = generateResultMessage();
                             break;
                         case "Open":
                             results.setVisibility(View.GONE);
@@ -126,6 +133,8 @@ public class MainActivity extends AppCompatActivity {
                             adapter.notifyDataSetChanged();
                             break;
                     }
+                    if (list != null && client != null)
+                        client.setMessage(list);
                 default:
                     super.handleMessage(msg);
             }
@@ -146,6 +155,11 @@ public class MainActivity extends AppCompatActivity {
         serverPort = (EditText) findViewById(R.id.serverPort);
         recyclerView = (RecyclerView) findViewById(R.id.messageReceivedList);
         results = (TextView) findViewById(R.id.results);
+
+        previousData = getSharedPreferences("previousYears", MODE_PRIVATE);
+
+        Calendar c = Calendar.getInstance();
+        year = c.get(Calendar.YEAR);
 
         table.addCategory("CandidateID");
         table.addCategory("Candidate Type");
@@ -209,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static String organizeResults() {
+    private static void organizeResults() {
         finalTally = new StringBuilder();
         tallies = new HashMap<>(candidateMap.size());
 
@@ -243,10 +257,17 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         results.setVisibility(View.VISIBLE);
         results.setText(finalTally);
-        return finalTally.toString();
+
+        String previous = previousData.getString((year - 1) + "Data", "");
+        if (!previous.equals(""))
+            results.append("\nPrevious Year's Trends: " + previous);
+
+        SharedPreferences.Editor editor = previousData.edit();
+        editor.putString(year + "Data", finalTally.toString());
+        editor.apply();
     }
 
-    public static String mostPopularCategory(String category) {
+    private static void mostPopularCategory(String category) {
         tallies = new HashMap<>();
         int total = 0;
 
@@ -275,7 +296,6 @@ public class MainActivity extends AppCompatActivity {
                 .append(" votes out of ")
                 .append(table.size())
                 .append("\n");
-        return finalTally.toString();
     }
 
     //Generate a test register message, please replace something of attributes with your own.
@@ -337,6 +357,22 @@ public class MainActivity extends AppCompatActivity {
                 list.putPair("Description", "Error");
                 break;
         }
+
+        return list;
+    }
+
+    static KeyValueList generateResultMessage() {
+        KeyValueList list = new KeyValueList();
+        //Set the scope of the message
+        list.putPair("Scope",SCOPE);
+        //Set the message type
+        list.putPair("MessageType","Reading");
+        //Set the sender or name of the message
+        list.putPair("Sender",SENDER);
+        //Set the role of the message
+        list.putPair("Message","New");
+        list.putPair("Receiver", "Tester");
+        list.putPair("Result", finalTally.toString());
 
         return list;
     }
