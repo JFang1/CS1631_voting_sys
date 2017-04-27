@@ -90,10 +90,10 @@ public class UnitTestMain {
         assertEquals(expectedStrK, MainActivity.mostPopularCategory("Embedded Systems"));
     }
 
-//    @Test
-//    public void test() throws Exception {
-//
-//    }
+    @Test
+    public void generateReplyMessageTest() throws Exception {
+
+    }
 //
 //    @Test
 //    public void test() throws Exception {
