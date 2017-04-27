@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static void organizeResults() {
+    public static String organizeResults() {
         finalTally = new StringBuilder();
         tallies = new HashMap<>(candidateMap.size());
 
@@ -243,9 +243,10 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         results.setVisibility(View.VISIBLE);
         results.setText(finalTally);
+        return finalTally.toString();
     }
 
-    private static void mostPopularCategory(String category) {
+    public static String mostPopularCategory(String category) {
         tallies = new HashMap<>();
         int total = 0;
 
@@ -274,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
                 .append(" votes out of ")
                 .append(table.size())
                 .append("\n");
+        return finalTally.toString();
     }
 
     //Generate a test register message, please replace something of attributes with your own.
