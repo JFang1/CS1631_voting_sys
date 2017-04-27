@@ -346,27 +346,82 @@ public class MainActivity extends AppCompatActivity {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
         //Toast.makeText(this, Boolean.toString(inputStream == null), Toast.LENGTH_SHORT).show();
         String line;
-        StringBuilder item = new StringBuilder();
-        boolean start = false;
+        StringBuilder keyPiece = new StringBuilder(), valuePiece = new StringBuilder();
+        boolean start = false, keyStart = false, valueStart = false;
+        int startIndex, endIndex;
+        String[] itemPieces;
 
         while ((line = reader.readLine()) != null) {
+            line = line.trim();
+
             if (!start && line.contains("<Msg>"))
                 start = true;
 
-            if (start && line.contains("</Msg>"))
-                start = false;
-
             if (start)
             {
-                if (line.contains("<Item>"))
-                    item = new StringBuilder();
-                if (line.contains("<Key>"))
-                    item.append(line.replace("<Key>", "").replace("</Key>", "")).append(":");
-                if (line.contains("<Value>"))
-                    item.append(line.replace("<Value>", "").replace("</Value>", ""));
-                if (line.contains("</Item>"))
-                    fileText.add(item.toString());
+                if (line.contains("</Msg>"))
+                    start = false;
+
+                line = line.replace("<Msg>", "").replace("</Msg>", "");
+
+                if (line.equals(""))
+                    continue;
+
+                itemPieces = line.split("<Item>");
+
+                for (int i = 0; i < itemPieces.length; i++)
+                {
+                    if (itemPieces[i].contains("<Key>"))
+                        keyStart = true;
+                    if (itemPieces[i].contains("<Value>"))
+                        valueStart = true;
+
+                    if (keyStart) {
+                        startIndex = itemPieces[i].indexOf("<Key>") + 5;
+                        endIndex = itemPieces[i].indexOf("</Key>");
+
+                        if (startIndex == 4)
+                            startIndex = 0;
+
+                        //if (endIndex == -1)
+                            //endIndex = itemPieces[i].indexOf("</Item>");
+
+                        if (startIndex <= endIndex)
+                            keyPiece.append(itemPieces[i], startIndex, endIndex);
+                        else
+                            keyPiece.append(itemPieces[i].substring(startIndex));
+                    }
+
+                    if (valueStart) {
+                        startIndex = itemPieces[i].indexOf("<Value>") + 7;
+                        endIndex = itemPieces[i].indexOf("</Value>");
+
+                        if (startIndex == 6)
+                            startIndex = 0;
+
+                        //if (endIndex == -1)
+                            //endIndex = itemPieces[i].indexOf("</Item>");
+
+                        if (startIndex <= endIndex)
+                            valuePiece.append(itemPieces[i], startIndex, endIndex);
+                        else
+                            valuePiece.append(itemPieces[i].substring(endIndex));
+                    }
+
+                    if (itemPieces[i].contains("</Key>"))
+                        keyStart = false;
+                    if (itemPieces[i].contains("</Value>"))
+                        valueStart = false;
+
+                    if (itemPieces[i].contains("</Item")) {
+                        if (keyPiece.length() != 0)
+                            fileText.add(keyPiece.toString() + ":" + valuePiece.toString());
+                        keyPiece = new StringBuilder();
+                        valuePiece = new StringBuilder();
+                    }
+                }
             }
+
         }
     }
 
