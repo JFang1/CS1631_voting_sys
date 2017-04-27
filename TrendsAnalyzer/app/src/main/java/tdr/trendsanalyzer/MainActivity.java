@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String DISCOONECTED =  "Disconnect";
     private static final String SCOPE = "SIS.Scope1";
 
-    private static TableList table = new TableList();
-    private static HashMap<String, String> candidateMap = new HashMap<>();
+    public static TableList table = new TableList();
+    public static HashMap<String, String> candidateMap = new HashMap<>();
 
     public static final int CONNECTED = 1;
     public static final int DISCONNECTED = 2;
@@ -223,7 +223,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static void organizeResults() {
+    public static String organizeResults() {
         finalTally = new StringBuilder();
         tallies = new HashMap<>(candidateMap.size());
 
@@ -265,9 +265,11 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = previousData.edit();
         editor.putString(year + "Data", finalTally.toString());
         editor.apply();
+
+        return finalTally.toString();
     }
 
-    private static void mostPopularCategory(String category) {
+    public static String mostPopularCategory(String category) {
         tallies = new HashMap<>();
         int total = 0;
 
@@ -296,6 +298,7 @@ public class MainActivity extends AppCompatActivity {
                 .append(" votes out of ")
                 .append(table.size())
                 .append("\n");
+        return finalTally.toString();
     }
 
     //Generate a test register message, please replace something of attributes with your own.

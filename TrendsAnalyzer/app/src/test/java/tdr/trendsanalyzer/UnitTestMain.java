@@ -11,18 +11,15 @@ import java.util.HashMap;
 import static junit.framework.Assert.assertEquals;
 
 public class UnitTestMain {
-    @Mock
-    TableList table;
 
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private HashMap<String, String> candidateMap = new HashMap<>();
-    private KeyValueList kvList = new KeyValueList();
-
-
     @Test
     public void organizeResultsTest() throws Exception {
+        HashMap<String, String> candidateMap = MainActivity.candidateMap;
+        TableList table = MainActivity.table;
+        table.clear();
         candidateMap.put("A", "Gaming");
         candidateMap.put("B", "Gaming");
         candidateMap.put("C", "Gaming");
@@ -38,24 +35,39 @@ public class UnitTestMain {
         candidateMap.put("M", "Embedded Systems");
         candidateMap.put("N", "Embedded Systems");
         candidateMap.put("O", "Embedded Systems");
-        table.addCategory("Gaming");
-        table.addCategory("Security");
-        table.addCategory("Embedded Systems");
-//        kvList.putPair("voter1","A");
-//        kvList.putPair("voter2","B");
-//        kvList.putPair("voter3","A");
 
-        table.add(kvList); // add votes to table?
+        KeyValueList kvList1 = new KeyValueList();
+        kvList1.putPair("CandidateID", "A");
+        KeyValueList kvList2 = new KeyValueList();
+        kvList2.putPair("CandidateID", "A");
+        KeyValueList kvList3 = new KeyValueList();
+        kvList3.putPair("CandidateID", "K");
+        table.add(kvList1); // add votes to table
+        table.add(kvList2);
+        table.add(kvList3);
+
         String expectedStr = "Most Popular Candidate: ID A; Gaming type with 2 votes out of 3\n";
         assertEquals(expectedStr, MainActivity.organizeResults());
 
         // vote for O 3 times
+        KeyValueList kvList4 = new KeyValueList();
+        kvList4.putPair("CandidateID", "O");
+        KeyValueList kvList5 = new KeyValueList();
+        kvList5.putPair("CandidateID", "O");
+        KeyValueList kvList6 = new KeyValueList();
+        kvList6.putPair("CandidateID", "O");
+        table.add(kvList4);
+        table.add(kvList5);
+        table.add(kvList6);
         String expectedStrO = "Most Popular Candidate: ID O; Embedded Systems type with 3 votes out of 6\n";
         assertEquals(expectedStrO, MainActivity.organizeResults());
     }
 
     @Test
     public void mostPopularCategoryTest() throws Exception {
+        HashMap<String, String> candidateMap = MainActivity.candidateMap;
+        TableList table = MainActivity.table;
+        table.clear();
         candidateMap.put("A", "Gaming");
         candidateMap.put("B", "Gaming");
         candidateMap.put("C", "Gaming");
@@ -71,29 +83,51 @@ public class UnitTestMain {
         candidateMap.put("M", "Embedded Systems");
         candidateMap.put("N", "Embedded Systems");
         candidateMap.put("O", "Embedded Systems");
-        table.addCategory("Gaming");
-        table.addCategory("Security");
-        table.addCategory("Embedded Systems");
+//        table.addCategory("Gaming");
+//        table.addCategory("Security");
+//        table.addCategory("Embedded Systems");
         // add vote for A
+        KeyValueList kvList1 = new KeyValueList();
+        kvList1.putPair("CandidateID", "A");
+        table.add(kvList1);
         // add another vote for A
+        KeyValueList kvList2 = new KeyValueList();
+        kvList2.putPair("CandidateID", "A");
+        table.add(kvList2);
         // add vote for B
+        KeyValueList kvList3 = new KeyValueList();
+        kvList3.putPair("CandidateID", "B");
+        table.add(kvList3);
         // ~C
+        KeyValueList kvList4 = new KeyValueList();
+        kvList4.putPair("CandidateID", "C");
+        table.add(kvList4);
         // ~D
+        KeyValueList kvList5 = new KeyValueList();
+        kvList5.putPair("CandidateID", "D");
+        table.add(kvList5);
         // ~E
+        KeyValueList kvList6 = new KeyValueList();
+        kvList6.putPair("CandidateID", "E");
+        table.add(kvList6);
 
-        table.add(kvList); // add votes to table?
         String expectedStr = "Most Popular Gaming out of 5: A with 2 votes out of 6\n";
         assertEquals(expectedStr, MainActivity.mostPopularCategory("Gaming"));
 
         // add vote for K
+        KeyValueList kvList7 = new KeyValueList();
+        kvList7.putPair("CandidateID", "K");
+        table.add(kvList7);
         String expectedStrK = "Most Popular Embedded Systems out of 1: K with 1 votes out of 1\n";
         assertEquals(expectedStrK, MainActivity.mostPopularCategory("Embedded Systems"));
     }
 
-    @Test
-    public void generateReplyMessageTest() throws Exception {
 
-    }
+
+//    @Test
+//    public void generateReplyMessageTest() throws Exception {
+//
+//    }
 //
 //    @Test
 //    public void test() throws Exception {
